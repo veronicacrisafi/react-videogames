@@ -59,15 +59,17 @@ function ItemsListPage() {
             <div className="row g-4">
                 {items.map((item) => (
                     <div className="col-12 col-md-6 col-lg-4" key={item.id}>
-                        <article className="card h-100 shadow-sm border-0 overflow-hidden">
+                        <article className="card item-card h-100 shadow-sm border-0 overflow-hidden">
                             {item.imageUrl ?
-                                <img
-                                    src={item.imageUrl}
-                                    alt={item.title}
-                                    className="card-img-top item-cover"
-                                />
+                                <div className="item-cover-wrap">
+                                    <img
+                                        src={item.imageUrl}
+                                        alt={item.title}
+                                        className="item-cover"
+                                    />
+                                </div>
                                 :
-                                <div className="placeholder-cover">Immagine non disponibile</div>}
+                                <div className="placeholder-cover list">Immagine non disponibile</div>}
 
                             <div className="card-body d-flex flex-column">
                                 <h2 className="h5 card-title mb-2">{item.title}</h2>
@@ -107,7 +109,7 @@ function ItemsListPage() {
                                     ) : 'n/d'}
                                 </p>
 
-                                <Link className="btn btn-outline-primary mt-auto" to={`/items/${item.id}`}>
+                                <Link className="btn btn-outline-primary w-100 mt-auto" to={`/items/${item.id}`}>
                                     Vai al dettaglio
                                 </Link>
                             </div>

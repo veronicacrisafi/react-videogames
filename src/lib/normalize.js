@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "./config";
+
 const firstValue = (...candidates) => {
   for (const value of candidates) {
     if (value !== undefined && value !== null && String(value).trim() !== "") {
@@ -97,6 +99,46 @@ const normalizeDeveloper = (rawItem) => {
   );
 };
 
+const isAbsoluteUrl = (value) => /^(https?:)?\/\//i.test(value);
+
+const isInlineImageUrl = (value) => /^(data|blob):/i.test(value);
+
+const resolveImageUrl = (value) => {
+  if (!value) {
+    return null;
+  }
+
+  const clean = String(value).trim();
+  if (clean.length === 0) {
+    return null;
+  }
+
+  if (isAbsoluteUrl(clean) || isInlineImageUrl(clean)) {
+    return clean;
+  }
+
+  // Laravel often stores just "videogames/file.png" on disk public.
+  if (clean.startsWith("public/")) {
+    const publicPath = clean.replace(/^public\//, "");
+    return `${API_BASE_URL}/storage/${publicPath}`;
+  }
+
+  if (clean.startsWith("storage/")) {
+    return `${API_BASE_URL}/${clean}`;
+  }
+
+  if (clean.startsWith("/videogames/")) {
+    return `${API_BASE_URL}/storage${clean}`;
+  }
+
+  if (!clean.startsWith("/")) {
+    return `${API_BASE_URL}/storage/${clean}`;
+  }
+
+  const normalizedPath = clean.startsWith("/") ? clean : `/${clean}`;
+  return `${API_BASE_URL}${normalizedPath}`;
+};
+
 export const normalizeItem = (rawItem) => {
   const safeRaw = rawItem ?? {};
 
@@ -110,14 +152,20 @@ export const normalizeItem = (rawItem) => {
       safeRaw.overview,
       "Nessuna descrizione disponibile.",
     ),
-    imageUrl: firstValue(
-      safeRaw.image,
-      safeRaw.imageUrl,
-      safeRaw.cover,
-      safeRaw.poster,
-      safeRaw.thumbnail,
-      safeRaw.thumb,
-      safeRaw.url,
+    imageUrl: resolveImageUrl(
+      firstValue(
+        safeRaw.immagine_videogame,
+        safeRaw.image,
+        safeRaw.imageUrl,
+        safeRaw.image_url,
+        safeRaw.cover,
+        safeRaw.copertina_videogame,
+        safeRaw.poster,
+        safeRaw.thumbnail,
+        safeRaw.thumb,
+        safeRaw.path_immagine,
+        safeRaw.url,
+      ),
     ),
     categories: normalizeCategories(safeRaw),
     consoles: normalizeConsoles(safeRaw),
