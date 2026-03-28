@@ -76,7 +76,7 @@ function ItemsListPage() {
                                 </p>
 
                                 <div className="d-flex flex-wrap gap-2 mb-3">
-                                    {item.categories.slice(0, 3).map((category) => (
+                                    {item.categories.slice(0, 10).map((category) => (
                                         <span
                                             key={`${item.id}-${category.name}`}
                                             className="badge border"
@@ -95,10 +95,10 @@ function ItemsListPage() {
                                 <p className="small text-secondary mb-3">
                                     <span className="fw-semibold text-dark">Console:</span>{' '}
                                     {item.consoles?.length ? (
-                                        item.consoles.slice(0, 2).map((consoleName) => (
+                                        item.consoles.slice(0, 10).map((consoleName) => (
                                             <span
                                                 key={`${item.id}-${consoleName}`}
-                                                className="badge border ms-1"
+                                                className="badge border ms-1 mb-2"
                                                 style={getConsoleBadgeStyle(consoleName)}
                                             >
                                                 {consoleName}
