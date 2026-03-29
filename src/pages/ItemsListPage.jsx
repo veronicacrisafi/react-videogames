@@ -1,32 +1,47 @@
+//useEffect gestire effetti collaterali dopo il render , useState per memorizzare e aggiornare lo stato del componente
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { getCategoryBadgeStyle, getConsoleBadgeStyle } from '../lib/badgeColors'
-import { fetchItems } from '../services/itemsApi'
+import { Link } from 'react-router-dom' //per la navigazione
+import { getCategoryBadgeStyle, getConsoleBadgeStyle } from '../lib/badgeColors' //per lo style badge generi(ugale al backend)
+import { fetchItems } from '../services/itemsApi' //funzione che chiama il back e ci dà la lista dei videogames
 
+//funzione per il jsx
 function ItemsListPage() {
+    //costante che contiene la lista dei videogames settata su un array vuoto(che dovrà essere popolato)
     const [items, setItems] = useState([])
+    //costante che indica se la pagina sta aspettando ancora la risposta dal back, settata su true
     const [loading, setLoading] = useState(true)
+    //costante per il messaggio eventuale di errore
     const [error, setError] = useState('')
 
+    //qui parte effettivamente la chiamata
+    //si usa useEffect per non far partire in continuazione la chiamata al backend ma solo all'apertura della pagina 
     useEffect(() => {
+        //funzione asincrona
         const loadItems = async () => {
+            //prova il caricamento in sicurezza
             try {
-                setLoading(true)
-                setError('')
-                const result = await fetchItems()
-                setItems(result)
-            } catch {
+                setLoading(true)//dice alla UI che il caricamento è in corso
+                setError('')//pulisce eventuali errori precedenti
+                const result = await fetchItems()//parte la chiamata API
+                setItems(result)//quando arriva il risultato viene salvato in setItems
+            }
+            //se fallisse il caricamento
+            catch {
+                //per eventuali errori tra front e back, non si popola la lista ma esce il messaggio di errore
                 setError(
                     'Impossibile caricare il catalogo. Controlla API, endpoint o variabili VITE_API_*.'
                 )
-            } finally {
-                setLoading(false)
+            }
+            //esegue sempre,sia che il caricamento vada a buon fine o se fallisse per spegnere il caricamento
+            finally {
+                setLoading(false)//deve sempre essere eseguito per spegnere lo stato di caricamento
             }
         }
 
-        loadItems()
+        loadItems()//per il load una sola volta
     }, [])
 
+    //dopo tutta la logica qui abbiamo la reale interfaccia
     return (
         <section>
             <div className="hero-panel mb-4">

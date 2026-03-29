@@ -1,42 +1,56 @@
+//useEffect gestire effetti collaterali dopo il render , useState per memorizzare e aggiornare lo stato del componente
 import { useEffect, useState } from 'react'
+//Link per la navigazione, useNavigate per i redirect, useParams per leggere l'id preso dall'URL
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { getCategoryBadgeStyle, getConsoleBadgeStyle } from '../lib/badgeColors'
-import { fetchItemById } from '../services/itemsApi'
+import { getCategoryBadgeStyle, getConsoleBadgeStyle } from '../lib/badgeColors'//style dei badge 
+import { fetchItemById } from '../services/itemsApi' //funzione che chiama il back e ci dà il singolo videogame
 
+//funzione per il jsx
 function ItemDetailsPage() {
-    const { id } = useParams()
-    const navigate = useNavigate()
+    const { id } = useParams()//legge i parametri dinamici della rotta dedicata in App.jsx
+    const navigate = useNavigate()//restituisce una funzione che permette di cambiare rotta (usata per /404)
 
+    //costante che contiene il videogame caricato, il valore iniziale è null perché il record non è ancora arrivato
     const [item, setItem] = useState(null)
+    //costante che indica il caricamento del dettaglio 
     const [loading, setLoading] = useState(true)
+    //costante per l'eventuale messaggio di errore
     const [error, setError] = useState('')
 
+    //qui parte effettivamente la chiamata
+    //si usa useEffect per non far partire in continuazione la chiamata al backend ma solo all'apertura della pagina 
     useEffect(() => {
+        //funzione asincrona
         const loadItem = async () => {
+            //se non trovasse l'id porta alla rotta di errore /404
             if (!id) {
                 navigate('/404', { replace: true })
                 return
             }
-
+            //prova a fare il caricamento
             try {
-                setLoading(true)
-                setError('')
-                const result = await fetchItemById(id)
-
+                setLoading(true)//caricamento in corso
+                setError('')//pulisce eventuali errori precedenti
+                const result = await fetchItemById(id)//parte la chiamata API
+                //se il risultato non venisse trovato, viene dirottato alla rotta di errore /404
                 if (!result?.id) {
                     navigate('/404', { replace: true })
                     return
                 }
-
+                //se invece lo trovasse darebbe il risultato
                 setItem(result)
-            } catch {
+            }
+            //se fallisse il caricamento
+            catch {
                 setError('Elemento non disponibile o non raggiungibile dal backend.')
-            } finally {
+            }
+            //esegue sempre,sia che il caricamento vada a buon fine o se fallisse per spegnere il caricamento
+            finally {
                 setLoading(false)
             }
         }
 
-        loadItem()
+        loadItem()//per rieseguire il load e le dipendenze, solo ad ogni passaggio di dettaglio 
     }, [id, navigate])
 
     if (loading) {
